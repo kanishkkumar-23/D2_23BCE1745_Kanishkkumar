@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuMail - Quantum Secure Email Client</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js for 3D animations -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'quantum-violet': '#6366f1',
+                        'quantum-purple': '#8b5cf6',
+                        'quantum-dark': '#1a1b2e',
+                        'quantum-light': '#e0e7ff'
+                    },
+                    animation: {
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 3s ease-in-out infinite',
+                        'quantum-pulse': 'quantum-pulse 1.5s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS for glassmorphism effects -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+        
+        /* Enhanced glassmorphism effects */
+        .glass {
+            backdrop-filter: blur(18px) saturate(120%);
+            -webkit-backdrop-filter: blur(18px) saturate(120%);
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-dark {
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            background-color: rgba(0, 0, 0, 0.92);
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.25);
+            position: relative;
+        }
+        
+        /* Ultra Dark Enhanced glassmorphism card effect */
+        .glass-card {
+            backdrop-filter: blur(16px) saturate(150%);
+            -webkit-backdrop-filter: blur(16px) saturate(150%);
+            background-color: rgba(0, 0, 0, 0.85);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            background-color: rgba(5, 0, 10, 0.9);
+            border: 1px solid rgba(139, 92, 246, 0.35);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Ultra Dark ISRO-themed starry space background */
+        .quantum-bg {
+            background: 
+                /* Deep space gradient - much darker */
+                linear-gradient(135deg, #000000 0%, #020008 15%, #050010 30%, #0a0015 45%, #10001a 60%, #15001f 75%, #1a0025 90%, #200030 100%);
+            background-size: 400% 400%;
+            animation: quantum-gradient 20s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Starfield layers */
+        .quantum-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                /* Darker nebula effects */
+                radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse at 80% 70%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 10%, rgba(168, 85, 247, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 90%, rgba(79, 70, 229, 0.05) 0%, transparent 55%),
+                /* Subtle distant stars */
+                radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.35), transparent),
+                radial-gradient(1px 1px at 160px 30px, rgba(255, 255, 255, 0.25), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px, 300px 300px, 250px 250px, 280px 280px, 180px 180px;
+            animation: stars-drift 30s linear infinite, nebula-flow 25s ease-in-out infinite;
+        }
+        
+        /* Additional star layer for depth */
+        .quantum-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                /* Dimmer closer stars for dark theme */
+                radial-gradient(1px 1px at 25px 50px, rgba(139, 92, 246, 0.6), transparent),
+                radial-gradient(1px 1px at 75px 20px, rgba(99, 102, 241, 0.5), transparent),
+                radial-gradient(1px 1px at 125px 60px, rgba(168, 85, 247, 0.4), transparent),
+                radial-gradient(1px 1px at 175px 10px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 50px 90px, rgba(79, 70, 229, 0.4), transparent),
+                /* Subtle twinkling effect */
+                radial-gradient(1px 1px at 110px 30px, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 15px 80px, rgba(255, 255, 255, 0.4), transparent);
+            background-repeat: repeat;
+            background-size: 150px 150px, 200px 200px, 170px 170px, 220px 220px, 190px 190px, 160px 160px, 140px 140px;
+            animation: stars-twinkle 8s ease-in-out infinite alternate, stars-drift-slow 40s linear infinite reverse;
+        }
+        
+        /* Space-themed animations */
+        @keyframes quantum-gradient {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 20%; }
+            50% { background-position: 80% 100%; }
+            75% { background-position: 20% 80%; }
+        }
+        
+        @keyframes stars-drift {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-200px) translateY(-200px); }
+        }
+        
+        @keyframes stars-drift-slow {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            100% { transform: translateX(-100px) translateY(-100px) rotate(360deg); }
+        }
+        
+        @keyframes stars-twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes nebula-flow {
+            0%, 100% { 
+                opacity: 0.6; 
+                transform: translateX(0) translateY(0) scale(1); 
+            }
+            33% { 
+                opacity: 0.8; 
+                transform: translateX(10px) translateY(-10px) scale(1.05); 
+            }
+            66% { 
+                opacity: 0.4; 
+                transform: translateX(-10px) translateY(10px) scale(0.95); 
+            }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+            to { box-shadow: 0 0 30px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.3); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes quantum-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.8);
+        }
+        
+        /* Loading animation */
+        .loading-dots {
+            display: inline-block;
+        }
+        
+        .loading-dots::after {
+            content: '';
+            animation: loading-dots 1.5s infinite;
+        }
+        
+        @keyframes loading-dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+        
+        /* ISRO Satellite Animation */
+        .satellite-orbit {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 50%;
+            animation: satellite-orbit 45s linear infinite;
+        }
+        
+        .satellite {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 12px;
+        }
+        
+        .satellite-body {
+            width: 8px;
+            height: 12px;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            border-radius: 2px;
+            margin: 0 auto;
+            box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+        }
+        
+        .satellite-panel {
+            position: absolute;
+            top: 3px;
+            width: 3px;
+            height: 6px;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.8), rgba(139, 92, 246, 0.6));
+            border-radius: 1px;
+        }
+        
+        .satellite-panel-left {
+            left: -4px;
+            animation: panel-glow 2s ease-in-out infinite alternate;
+        }
+        
+        .satellite-panel-right {
+            right: -4px;
+            animation: panel-glow 2s ease-in-out infinite alternate-reverse;
+        }
+        
+        @keyframes satellite-orbit {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes panel-glow {
+            0% { box-shadow: 0 0 4px rgba(139, 92, 246, 0.4); }
+            100% { box-shadow: 0 0 8px rgba(139, 92, 246, 0.8); }
+        }
+
+        /* Quantum Key Display Styles */
+        .quantum-key-item {
+            border-left: 3px solid rgba(139, 92, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .quantum-key-item:hover {
+            border-left-color: rgba(139, 92, 246, 0.8);
+        }
+
+        .security-level {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .level-1 { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .level-2 { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .level-3 { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .level-4 { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .consume-key-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Task 11: Placeholder Animations for QKD Key Flow */
+        
+        /* Quantum Pulse Animation */
+        @keyframes quantum-pulse {
+            0%, 100% { 
+                opacity: 0.6; 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
+            }
+        }
+
+        /* Spinning Quantum Loader */
+        @keyframes quantum-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Key Generation Flow Animation */
+        @keyframes key-generation {
+            0% { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.8);
+                filter: blur(5px);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateY(10px) scale(0.9);
+                filter: blur(2px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Quantum Entanglement Effect */
+        @keyframes quantum-entanglement {
+            0%, 100% { 
+                background: linear-gradient(45deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3));
+            }
+            25% { 
+                background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(139, 92, 246, 0.4));
+            }
+            50% { 
+                background: linear-gradient(225deg, rgba(99, 102, 241, 0.5), rgba(168, 85, 247, 0.3));
+            }
+            75% { 
+                background: linear-gradient(315deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.4));
+            }
+        }
+
+        /* Data Transfer Animation */
+        @keyframes data-flow {
+            0% { 
+                transform: translateX(-100%); 
+                opacity: 0; 
+            }
+            50% { 
+                transform: translateX(0%); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateX(100%); 
+                opacity: 0; 
+            }
+        }
+
+        /* Violet Glow Pulse */
+        @keyframes violet-glow {
+            0%, 100% { 
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+                border-color: rgba(139, 92, 246, 0.5);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
+                border-color: rgba(139, 92, 246, 0.9);
+            }
+        }
+
+        /* Security Level Indicator Animation */
+        @keyframes security-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Quantum State Transition */
+        @keyframes quantum-transition {
+            0% { 
+                background: rgba(139, 92, 246, 0.1);
+                border-left-color: rgba(139, 92, 246, 0.3);
+            }
+            25% { 
+                background: rgba(99, 102, 241, 0.15);
+                border-left-color: rgba(99, 102, 241, 0.5);
+            }
+            50% { 
+                background: rgba(168, 85, 247, 0.2);
+                border-left-color: rgba(168, 85, 247, 0.7);
+            }
+            75% { 
+                background: rgba(79, 70, 229, 0.15);
+                border-left-color: rgba(79, 70, 229, 0.5);
+            }
+            100% { 
+                background: rgba(139, 92, 246, 0.1);
+                border-left-color: rgba(139, 92, 246, 0.3);
+            }
+        }
+
+        /* Apply animations to elements */
+        .animate-quantum-pulse { animation: quantum-pulse 2s ease-in-out infinite; }
+        .animate-quantum-spin { animation: quantum-spin 2s linear infinite; }
+        .animate-key-generation { animation: key-generation 0.8s ease-out; }
+        .animate-quantum-entanglement { animation: quantum-entanglement 4s ease-in-out infinite; }
+        .animate-data-flow { animation: data-flow 3s ease-in-out infinite; }
+        .animate-violet-glow { animation: violet-glow 2.5s ease-in-out infinite; }
+        .animate-security-pulse { animation: security-pulse 1.5s ease-in-out infinite; }
+        .animate-quantum-transition { animation: quantum-transition 6s ease-in-out infinite; }
+
+        /* Quantum Loader Spinner */
+        .quantum-loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.2);
+            border-top: 3px solid rgba(139, 92, 246, 1);
+            border-radius: 50%;
+            animation: quantum-spin 1s linear infinite;
+        }
+
+        /* Quantum Flow Lines */
+        .quantum-flow-line {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-flow-line::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), transparent);
+            animation: data-flow 2s ease-in-out infinite;
+        }
+
+        /* QKD Overlay Styles */
+        #qkd-overlay {
+            animation: overlay-fade-in 0.3s ease-out;
+        }
+
+        #qkd-overlay.hidden {
+            display: none !important;
+        }
+
+        @keyframes overlay-fade-in {
+            from { 
+                opacity: 0; 
+                backdrop-filter: blur(0px);
+            }
+            to { 
+                opacity: 1; 
+                backdrop-filter: blur(8px);
+            }
+        }
+
+        @keyframes overlay-fade-out {
+            from { 
+                opacity: 1; 
+                backdrop-filter: blur(8px);
+            }
+            to { 
+                opacity: 0; 
+                backdrop-filter: blur(0px);
+            }
+        }
+    </style>
+</head>
+<body class="quantum-bg min-h-screen">
+    <!-- ISRO Satellite Animation Layer -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="satellite-orbit">
+            <div class="satellite">
+                <div class="satellite-body"></div>
+                <div class="satellite-panel satellite-panel-left"></div>
+                <div class="satellite-panel satellite-panel-right"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Application Container -->
+    <div id="app" class="h-screen flex flex-col relative z-10">
+        <!-- Header -->
+        <header class="glass-dark border-b border-violet-500/30 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center animate-glow">
+                        <span class="text-white font-bold text-sm">Q</span>
+                    </div>
+                    <h1 class="text-white text-xl font-bold">QuMail</h1>
+                    <span class="text-violet-300 text-sm">Quantum Secure</span>
+                </div>
+                
+                <!-- Status Indicator -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 rounded-full bg-green-400 animate-quantum-pulse"></div>
+                    <span class="text-green-300 text-sm">Connected</span>
+                </div>
+            </div>
+            
+            <!-- Header Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Profile Icon -->
+                <button id="profile-btn" class="glass hover:bg-white/20 p-2 rounded-lg transition-colors flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Sidebar -->
+            <aside class="w-64 glass-dark border-r border-violet-500/30 p-4 overflow-y-auto">
+                <nav class="space-y-2">
+                    <!-- Compose Button -->
+                    <button id="sidebar-compose-btn" class="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 animate-float">
+                        <div class="flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span>Compose</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Navigation Items -->
+                    <div class="space-y-1 mt-6">
+                        <a href="#" id="nav-inbox" class="nav-folder flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors group" data-folder="inbox">
+                            <svg class="w-5 h-5 text-violet-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <span class="text-white group-hover:text-violet-100">Inbox</span>
+                            <span id="inbox-count" class="ml-auto bg-violet-500 text-white text-xs px-2 py-1 rounded-full">0</span>
+                        </a>
+                        
+                        <a href="#" id="nav-sent" class="nav-folder flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors group" data-folder="sent">
+                            <svg class="w-5 h-5 text-violet-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                            <span class="text-white group-hover:text-violet-100">Sent</span>
+                            <span id="sent-count" class="ml-auto bg-violet-500/50 text-white text-xs px-2 py-1 rounded-full">0</span>
+                        </a>
+                        
+                        <a href="#" id="nav-drafts" class="nav-folder flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors group" data-folder="drafts">
+                            <svg class="w-5 h-5 text-violet-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            <span class="text-white group-hover:text-violet-100">Drafts</span>
+                            <span id="drafts-count" class="ml-auto bg-violet-500/50 text-white text-xs px-2 py-1 rounded-full">0</span>
+                        </a>
+                        
+                        <a href="#" id="nav-trash" class="nav-folder flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors group" data-folder="trash">
+                            <svg class="w-5 h-5 text-violet-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            <span class="text-white group-hover:text-violet-100">Trash</span>
+                            <span id="trash-count" class="ml-auto bg-violet-500/50 text-white text-xs px-2 py-1 rounded-full">0</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Quantum Network Section -->
+                    <div class="mt-8 pt-6 border-t border-violet-500/30">
+                        <h3 class="text-violet-300 text-sm font-medium mb-3">Quantum Network</h3>
+                        <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors group">
+                            <div class="w-5 h-5 rounded-full bg-gradient-to-r from-green-400 to-blue-500 animate-quantum-pulse"></div>
+                            <span class="text-white group-hover:text-violet-100">QKD Status</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors group">
+                            <div class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 animate-quantum-pulse"></div>
+                            <span class="text-white group-hover:text-violet-100">Key Exchange</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="flex-1 flex overflow-hidden">
+                <!-- 3-Column Layout: Email Thumbnails + Compose Area -->
+                <div class="flex-1 flex">
+                    <!-- Middle Column: Email Thumbnails -->
+                    <div class="w-96 border-r border-violet-500/30 flex flex-col">
+                        <!-- Email List Header -->
+                        <div class="p-4 border-b border-violet-500/30">
+                            <div class="flex items-center justify-between">
+                                <h2 id="folder-title" class="text-xl font-bold text-white">Inbox</h2>
+                                <span id="email-list-count" class="text-violet-300 text-sm">0 emails</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Loading Indicator -->
+                        <div id="loading-indicator" class="hidden p-8 text-center">
+                            <div class="flex items-center justify-center space-x-3 mb-4">
+                                <div class="w-6 h-6 border-4 border-violet-500/30 border-t-violet-400 rounded-full animate-spin"></div>
+                                <span class="text-white">Loading...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Thumbnails List -->
+                        <div id="email-list-container" class="flex-1 overflow-y-auto">
+                            <div id="email-list" class="p-2 space-y-2">
+                                <!-- Email thumbnails will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Compose Area + Email Dialog Overlay -->
+                    <div class="flex-1 relative flex flex-col">
+                        <!-- Email Reading Dialog (Overlay) -->
+                        <div id="email-reader-overlay" class="hidden absolute inset-0 z-10 bg-black/50 flex items-center justify-center p-4">
+                            <div class="glass-card p-6 rounded-2xl max-w-4xl w-full max-h-full overflow-y-auto">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 id="email-reader-subject" class="text-2xl font-bold text-white">Email Subject</h2>
+                                    <button id="close-email-reader" class="text-violet-300 hover:text-white text-xl p-2 rounded-lg hover:bg-white/10">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="email-reader-content" class="text-white">
+                                    <!-- Email content will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Composer (Always Visible Under Overlay) -->
+                        <div id="email-composer-container" class="flex-1 p-6 transition-all duration-300">
+                            <div class="glass-card p-6 rounded-2xl h-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-2xl font-bold text-white">Compose Secure Email</h2>
+                                <div class="flex items-center space-x-4">
+                                    <!-- Encryption Level Selector -->
+                                    <select id="encryption-level" class="glass-card px-4 py-2 rounded-lg text-white bg-transparent border-none outline-none">
+                                        <option value="1" class="bg-slate-800">Level 1: Quantum Secure</option>
+                                        <option value="2" class="bg-slate-800" selected>Level 2: Quantum-aided AES</option>
+                                        <option value="3" class="bg-slate-800">Level 3: Hybrid PQC</option>
+                                        <option value="4" class="bg-slate-800">Level 4: No Quantum Security</option>
+                                    </select>
+                                    
+                                    <!-- Security Status -->
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-2 h-2 rounded-full bg-green-400 animate-quantum-pulse"></div>
+                                        <span class="text-green-300 text-sm font-medium">192-bit Secure</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Form -->
+                            <div class="space-y-3 flex-1 flex flex-col">
+                                <!-- To Field -->
+                                <div class="glass-card p-3 rounded-xl">
+                                    <div class="flex items-center space-x-3">
+                                        <label class="text-violet-300 font-medium w-16">To:</label>
+                                        <input id="recipient" type="email" placeholder="recipient@example.com" class="bg-transparent text-white placeholder-violet-400 border-none outline-none flex-1">
+                                    </div>
+                                </div>
+                                
+                                <!-- Subject Field -->
+                                <div class="glass-card p-3 rounded-xl">
+                                    <div class="flex items-center space-x-3">
+                                        <label class="text-violet-300 font-medium w-16">Subject:</label>
+                                        <input id="subject" type="text" placeholder="Enter quantum-secure subject..." class="bg-transparent text-white placeholder-violet-400 border-none outline-none flex-1">
+                                    </div>
+                                </div>
+                                
+                                <!-- Message Body -->
+                                <div class="glass-card p-3 rounded-xl flex-1">
+                                    <textarea id="message" rows="12" placeholder="Compose your quantum-encrypted message here..." class="w-full h-full bg-transparent text-white placeholder-violet-400 border-none outline-none resize-none"></textarea>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <!-- Attachment Button -->
+                                        <button class="glass-card hover:bg-white/10 p-3 rounded-lg transition-colors">
+                                            <svg class="w-5 h-5 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586a2 2 0 00-2.828-2.828z"></path>
+                                            </svg>
+                                        </button>
+                                        
+                                        <!-- Voice Message -->
+                                        <button class="glass-card hover:bg-white/10 p-3 rounded-lg transition-colors">
+                                            <svg class="w-5 h-5 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                            </svg>
+                                        </button>
+                                        
+                                        <!-- QKD Management Button -->
+                                        <button id="open-qkd-panel" class="flex items-center space-x-2 text-sm glass-card hover:bg-white/10 p-3 rounded-lg transition-colors animate-violet-glow">
+                                            <div class="w-2 h-2 rounded-full bg-green-400 animate-quantum-pulse"></div>
+                                            <span class="text-green-300">QKD Manager</span>
+                                            <svg class="w-4 h-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Send Button -->
+                                    <button id="send-secure-btn" class="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white py-2.5 px-6 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 animate-glow">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                        </svg>
+                                        <span>Send Secure</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Security Strength Gauge -->
+                            <div class="mt-4 pt-4 border-t border-violet-500/20">
+                                <div id="security-gauge" class="glass-card p-3 border border-violet-500/30 rounded-xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="text-sm font-semibold text-violet-300 flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                            </svg>
+                                            <span>Hybrid Security Strength</span>
+                                        </h4>
+                                        <span id="bit-strength" class="text-xs text-gray-300 font-mono">192-bit</span>
+                                    </div>
+                                    
+                                    <!-- Gauge Bar -->
+                                    <div class="relative mb-2">
+                                        <div class="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
+                                            <div id="security-bar" class="h-2 rounded-full transition-all duration-700 ease-out bg-gradient-to-r from-blue-400 to-blue-500" style="width: 85%">
+                                                <div class="h-full w-full animate-pulse bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Gauge Markers -->
+                                        <div class="flex justify-between mt-1 text-xs">
+                                            <span class="text-gray-500">0%</span>
+                                            <span class="text-gray-400">50%</span>
+                                            <span class="text-violet-300">100%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Security Level Description -->
+                                    <div id="security-description" class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <div id="security-indicator" class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+                                            <span id="security-text" class="text-blue-300 text-sm font-medium">Level 2: Quantum-aided AES</span>
+                                        </div>
+                                        <span id="security-details" class="text-xs text-gray-400">QKD + AES-256</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Status Bar -->
+        <footer class="glass-dark border-t border-violet-500/30 px-6 py-2 flex items-center justify-between text-sm">
+            <div class="flex items-center space-x-4">
+                <span class="text-violet-300">Ready</span>
+                <span class="text-violet-500">•</span>
+                <span class="text-violet-300">Firebase Connected</span>
+                <span class="text-violet-500">•</span>
+                <span class="text-violet-300">Python 3.12 Backend</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <span class="text-violet-300">ISRO SIH 2025</span>
+                <span class="text-violet-500">•</span>
+                <span class="text-violet-300">QuMail v1.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- QKD Overlay Modal -->
+    <div id="qkd-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass-dark border border-violet-500/30 rounded-2xl p-6 m-4 w-full max-w-2xl max-h-[80vh] overflow-y-auto animate-key-generation">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-violet-300 flex items-center space-x-3">
+                    <span>🔐</span>
+                    <span>Quantum Key Distribution</span>
+                </h2>
+                <button id="close-qkd-panel" class="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                    <svg class="w-6 h-6 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- QKD Status & Controls -->
+            <div class="flex items-center justify-between mb-6 glass p-4 rounded-xl">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-quantum-pulse"></div>
+                        <span class="qkd-status text-green-400 text-lg font-medium">Connected</span>
+                    </div>
+                    <div class="quantum-loader" style="width: 20px; height: 20px; border-width: 2px;"></div>
+                </div>
+                <button id="generate-qkd-key" class="px-4 py-2 bg-violet-500/20 text-violet-300 rounded-lg hover:bg-violet-500/30 transition-colors animate-violet-glow flex items-center space-x-2">
+                    <span>Generate Key</span>
+                    <div class="quantum-loader" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                </button>
+            </div>
+
+            <!-- Protocol Information -->
+            <div class="mb-6 animate-quantum-entanglement p-4 rounded-xl">
+                <div class="text-center text-gray-300">
+                    <div class="text-lg mb-2">
+                        Active Keys: <span class="quantum-key-count text-violet-300 animate-security-pulse text-2xl font-bold">0</span>
+                    </div>
+                    <div class="text-sm space-x-2">
+                        <span>Protocol: <span class="text-violet-400 font-medium">BB84</span></span>
+                        <span class="text-violet-500">•</span>
+                        <span class="text-green-400 font-medium">ETSI GS QKD 014 Compliant</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quantum Keys Display -->
+            <div id="quantum-keys-display" class="space-y-3 max-h-96 overflow-y-auto mb-6">
+                <!-- Quantum keys will be dynamically inserted here -->
+            </div>
+
+            <!-- Encryption Status -->
+            <div class="glass-dark p-4 rounded-xl">
+                <h3 class="text-lg font-semibold text-violet-300 mb-3 flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    <span>Current Encryption Status</span>
+                </h3>
+                <div class="encryption-status">
+                    <div class="text-blue-400 text-xl font-medium">Level 2: Quantum-aided AES</div>
+                    <div class="text-gray-400">QKD + AES-256 Encryption</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hybrid Key Animation Modal -->
+    <div id="hybrid-key-modal" class="fixed inset-0 bg-black/70 backdrop-blur-lg z-50 hidden flex items-center justify-center">
+        <div class="glass-dark border border-violet-500/30 rounded-3xl p-8 mx-4 w-full max-w-2xl">
+            <!-- Animation Header -->
+            <div class="text-center mb-6 relative">
+                <button id="close-hybrid-modal" class="absolute top-0 right-0 text-gray-400 hover:text-white text-2xl">&times;</button>
+                <h2 class="text-3xl font-bold text-violet-300 mb-2">🔐 Hybrid Encryption</h2>
+                <p class="text-gray-300">Generating quantum-secure super-key...</p>
+            </div>
+            
+            <!-- Three.js Animation Canvas -->
+            <div class="relative bg-black/30 rounded-2xl overflow-hidden mb-6" style="height: 400px;">
+                <canvas id="hybrid-animation-canvas" class="w-full h-full"></canvas>
+                
+                <!-- Key Type Labels -->
+                <div class="absolute top-4 left-4 space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+                        <span class="text-green-400 text-sm font-medium">QKD Keys</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-purple-400 animate-pulse"></div>
+                        <span class="text-purple-400 text-sm font-medium">ML-KEM-768</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-blue-400 animate-pulse"></div>
+                        <span class="text-blue-400 text-sm font-medium">ECDH/X25519</span>
+                    </div>
+                </div>
+                
+                <!-- Super-key Status -->
+                <div class="absolute bottom-4 right-4">
+                    <div id="super-key-status" class="glass-card px-4 py-2 rounded-lg">
+                        <span class="text-violet-300 text-sm font-medium">Deriving...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Indicator -->
+            <div class="mb-4">
+                <div class="flex justify-between text-sm text-gray-400 mb-2">
+                    <span>Key Generation Progress</span>
+                    <span id="progress-percentage">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div id="progress-bar" class="h-2 bg-gradient-to-r from-green-400 via-purple-400 to-violet-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Status Messages -->
+            <div id="animation-status" class="text-center text-gray-300 text-sm">
+                Initializing quantum channels...
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include Three.js for 3D animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Include Quantum Key Manager -->
+    <script src="renderer.js"></script>
+    <!-- Include Real Encryption API -->
+    <script src="real_encryption.js"></script>
+    <!-- Include Email Integration -->
+    <script src="email_integration.js"></script>
+    <!-- Include Email Manager -->
+    <script src="email_manager.js"></script>
+    <!-- Include Profile Manager -->
+    <script src="profile_manager.js"></script>
+    <!-- Include Compose Manager -->
+    <script src="compose_manager.js"></script>
+    <!-- Include Hybrid Key Animation -->
+    <script src="hybrid_animation.js"></script>
+    <!-- Include GUI Testing Suite -->
+    <script src="test_gui.js"></script>
+    <!-- Include Live Integration Testing (Development Only) -->
+    <script src="test_live_integration.js"></script>
+    <script>
+        // QKD Panel Management
+        document.addEventListener('DOMContentLoaded', function() {
+            // QKD Overlay Controls
+            const qkdOverlay = document.getElementById('qkd-overlay');
+            const openQkdBtn = document.getElementById('open-qkd-panel');
+            const closeQkdBtn = document.getElementById('close-qkd-panel');
+
+            // Open QKD Panel
+            openQkdBtn?.addEventListener('click', () => {
+                qkdOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+                
+                // Sync with backend when QKD panel is opened
+                if (window.qkdManager && window.qkdManager.syncWithBackend) {
+                    window.qkdManager.syncWithBackend();
+                    console.log('🔄 QKD Manager opened - syncing with backend...');
+                }
+            });
+
+            // Close QKD Panel
+            closeQkdBtn?.addEventListener('click', () => {
+                qkdOverlay.style.animation = 'overlay-fade-out 0.3s ease-out';
+                setTimeout(() => {
+                    qkdOverlay.classList.add('hidden');
+                    qkdOverlay.style.animation = '';
+                    document.body.style.overflow = ''; // Restore scroll
+                }, 300);
+            });
+
+            // Close on overlay click (not modal content)
+            qkdOverlay?.addEventListener('click', (e) => {
+                if (e.target === qkdOverlay) {
+                    closeQkdBtn.click();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !qkdOverlay.classList.contains('hidden')) {
+                    closeQkdBtn.click();
+                }
+            });
+        });
+
+        // QuMail Additional UI Enhancements
+        console.log('🚀 QuMail Quantum Secure Email Client - Starting...');
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ QuMail UI Loaded Successfully');
+            
+            // Add subtle animations to elements
+            const cards = document.querySelectorAll('.glass, .glass-dark');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+        
+        // Handle window resize for responsive design
+        window.addEventListener('resize', () => {
+            // Adjust layout for different screen sizes
+            console.log('Window resized:', window.innerWidth, 'x', window.innerHeight);
+        });
+    </script>
+</body>
+</html>

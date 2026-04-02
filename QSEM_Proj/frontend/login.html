@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuMail - Quantum Secure Email Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .quantum-animation {
+            animation: quantumPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes quantumPulse {
+            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
+            100% { box-shadow: 0 0 40px rgba(118, 75, 162, 0.7); }
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-8 w-full max-w-md quantum-animation">
+        <!-- Logo and Title -->
+        <div class="text-center mb-8">
+            <div class="text-6xl mb-4">🔐</div>
+            <h1 class="text-3xl font-bold text-white mb-2">QuMail</h1>
+            <p class="text-white/80 text-sm">Quantum-Secure Email Client</p>
+            <p class="text-white/60 text-xs mt-1"></p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+            <!-- Gmail Email Input -->
+            <div>
+                <label class="block text-white/90 text-sm font-medium mb-2">
+                    📧 Gmail Address
+                </label>
+                <input 
+                    type="email" 
+                    id="gmailEmail"
+                    placeholder="your.email@gmail.com"
+                    required
+                    class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-white/50"
+                />
+                <p class="text-white/60 text-xs mt-1">Enter your Gmail address</p>
+            </div>
+
+            <!-- App Password Input -->
+            <div>
+                <label class="block text-white/90 text-sm font-medium mb-2">
+                    🔑 Gmail App Password
+                </label>
+                <input 
+                    type="password" 
+                    id="appPassword"
+                    placeholder="xxxx xxxx xxxx xxxx"
+                    required
+                    class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-white/50 font-mono"
+                />
+                <p class="text-white/60 text-xs mt-1">16-character app-specific password</p>
+            </div>
+
+            <!-- App Password Help -->
+            <div class="bg-white/10 rounded-lg p-3">
+                <p class="text-white/80 text-xs mb-2">
+                    <strong>📱 Need an App Password?</strong>
+                </p>
+                <ol class="text-white/70 text-xs space-y-1 ml-4 list-decimal">
+                    <li>Go to <strong>myaccount.google.com</strong></li>
+                    <li>Security → 2-Step Verification</li>
+                    <li>App passwords → Generate new</li>
+                    <li>Select "Mail" and copy the 16-character code</li>
+                </ol>
+                <button type="button" id="helpButton" class="text-blue-300 text-xs mt-2 underline hover:text-blue-200">
+                    📋 Open Setup Guide
+                </button>
+            </div>
+
+            <!-- Login Button -->
+            <button 
+                type="submit" 
+                id="loginButton"
+                class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+            >
+                🚀 Launch QuMail
+            </button>
+
+            <!-- Status Messages -->
+            <div id="statusMessage" class="hidden text-center p-3 rounded-lg">
+                <span id="statusText"></span>
+            </div>
+        </form>
+
+        <!-- Features Preview -->
+        <div class="mt-8 text-center">
+            <p class="text-white/60 text-xs mb-3">🛡️ Security Features</p>
+            <div class="grid grid-cols-2 gap-3 text-white/70 text-xs">
+                <div class="bg-white/5 rounded p-2">
+                    <div class="text-sm mb-1">🔐</div>
+                    <div>Quantum-Safe</div>
+                </div>
+                <div class="bg-white/5 rounded p-2">
+                    <div class="text-sm mb-1">🌐</div>
+                    <div>ML-KEM-768</div>
+                </div>
+                <div class="bg-white/5 rounded p-2">
+                    <div class="text-sm mb-1">⚡</div>
+                    <div>Real QKD</div>
+                </div>
+                <div class="bg-white/5 rounded p-2">
+                    <div class="text-sm mb-1">🎯</div>
+                    <div>ETSI Compliant</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Form elements
+        const loginForm = document.getElementById('loginForm');
+        const gmailEmail = document.getElementById('gmailEmail');
+        const appPassword = document.getElementById('appPassword');
+        const loginButton = document.getElementById('loginButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusText = document.getElementById('statusText');
+        const helpButton = document.getElementById('helpButton');
+
+        // Help button click
+        helpButton.addEventListener('click', () => {
+            ipcRenderer.send('open-external-url', 'https://myaccount.google.com/security');
+        });
+
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = gmailEmail.value.trim();
+            const password = appPassword.value.trim();
+
+            // Validation
+            if (!email || !password) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!email.endsWith('@gmail.com')) {
+                showStatus('Please enter a valid Gmail address', 'error');
+                return;
+            }
+
+            // Remove spaces for validation
+            const cleanPassword = password.replace(/\s/g, '');
+            if (cleanPassword.length !== 16) {
+                showStatus('App password must be 16 characters', 'error');
+                return;
+            }
+
+            // Start login process
+            showStatus('🔐 Connecting to Gmail...', 'loading');
+            loginButton.disabled = true;
+
+            try {
+                // Validate credentials with backend
+                const response = await fetch('http://localhost:5000/api/email/status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: cleanPassword  // Send clean password without spaces
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus(' Login successful! Launching QuMail...', 'success');
+                    
+                    // Store credentials and launch main app
+                    localStorage.setItem('qumail_gmail_email', email);
+                    localStorage.setItem('qumail_gmail_password', cleanPassword);
+                    localStorage.setItem('qumail_logged_in', 'true');
+                    
+                    // Send credentials to main process
+                    ipcRenderer.send('login-success', { email, password: cleanPassword });
+                    
+                    // Redirect to main app after short delay
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showStatus(`❌ Login failed: ${result.error || 'Invalid credentials'}`, 'error');
+                    loginButton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showStatus(`❌ Connection error: ${error.message}`, 'error');
+                loginButton.disabled = false;
+            }
+        });
+
+        // Status message helper
+        function showStatus(message, type) {
+            statusText.textContent = message;
+            statusMessage.className = `text-center p-3 rounded-lg ${getStatusClass(type)}`;
+            statusMessage.classList.remove('hidden');
+        }
+
+        function getStatusClass(type) {
+            switch (type) {
+                case 'success': return 'bg-green-500/20 text-green-200';
+                case 'error': return 'bg-red-500/20 text-red-200';
+                case 'loading': return 'bg-blue-500/20 text-blue-200';
+                default: return 'bg-white/20 text-white';
+            }
+        }
+
+        // Auto-focus email field
+        gmailEmail.focus();
+
+        // Format app password as user types
+        appPassword.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\s/g, '');
+            if (value.length > 16) {
+                value = value.substring(0, 16);
+            }
+            // Add spaces every 4 characters for readability
+            value = value.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = value;
+        });
+
+        console.log('🔐 QuMail Login Page Loaded');
+        console.log('📧 Ready for Gmail authentication');
+    </script>
+</body>
+</html>
